@@ -3,7 +3,7 @@ import myContext from '../../context/myContext';
 import { useContext, useState } from 'react';
 import { toast } from 'react-toastify';
 import { auth } from '../../firebase/FirebaseConfig';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword,sendPasswordResetEmail } from 'firebase/auth';
 import Loader from '../../components/Loader';
 function Login() {
 
@@ -13,6 +13,37 @@ function Login() {
     const context = useContext(myContext)
     const { loading,setLoading} = context
 
+    const ForgotPassowrd = async () => {
+        setLoading(true); // Set loading state to true
+      
+        try {
+          await sendPasswordResetEmail(auth, email); // Send password reset email
+          toast.success('Password reset link sent successfully', { // Show success toast notification
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+          });
+        } catch (error) {
+          toast.error(error.message, { // Show error toast notification with the error message
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+          });
+        }
+      
+        setLoading(false); // Set loading state to false
+      }
+      
     const signin = async () => {
       setLoading(true);
       try {
@@ -76,6 +107,9 @@ function Login() {
                         className=' bg-yellow-500 w-full text-black font-bold  px-2 py-2 rounded-lg'>
                         Login
                     </button>
+                </div>
+                <div >
+                    <button onClick={ForgotPassowrd}  className=' text-yellow-500 font-bold'> Forgot Password?</button>
                 </div>
                 <div>
                     <h2 className='text-white'>Don't have an account <Link className=' text-yellow-500 font-bold' to={'/signup'}>Signup</Link></h2>

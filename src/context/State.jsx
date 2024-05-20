@@ -72,7 +72,7 @@ function MyState(props) {
         orderBy("time"),
         // limit(5)
       );
-      const data = onSnapshot(q, (QuerySnapshot) => {
+      const data =  onSnapshot(q, (QuerySnapshot) => {
         let productsArray = [];
         QuerySnapshot.forEach((doc) => {
           productsArray.push({ ...doc.data(), id: doc.id });
@@ -150,6 +150,7 @@ function MyState(props) {
 
  
 
+  const [orderType, setorderType] = useState('')
 
   const [searchkey, setSearchkey] = useState('')
   const [filterType, setFilterType] = useState('')
@@ -160,6 +161,7 @@ function MyState(props) {
     adress: null,
     pincode: null,
     number: null,
+    status:"waiting for picking",
     time: Timestamp.now(),
     date: new Date().toLocaleString(
       "en-US",
@@ -171,13 +173,13 @@ function MyState(props) {
     )
 
   })
-
+const [orders, setorders]= useState([])
   // ********************** add order Section  **********************
   const Addorder = async () => {
     console.log(order)
     if (order.name == null || order.adress == null || order.pincode == null || order.number == null) {
       return toast.error('Please fill all fields')
-      console.log(order)
+      
     }
     const orderRef = collection(fireDB, "orders")
     setLoading(true)
@@ -190,7 +192,9 @@ function MyState(props) {
       setTimeout(() => {
         window.location.href = '/'
       }, 1000);
-      
+      getOrderData();
+      // closeModal()
+      setLoading(false)
     } catch (error) {
       console.log(error)
       setLoading(false)
@@ -199,23 +203,58 @@ function MyState(props) {
     localStorage.setItem('cart', JSON.stringify([]));
   }
   const [orderLen,setorderLen]=useState(0)
+
+
   const getOrderData = async () => {
     setLoading(true)
     try {
-      const result = await getDocs(collection(fireDB, "orders"))
-     
-      const usersArray = [];
-      result.forEach((doc) => {
-        usersArray.push(doc.data());
-        setLoading(false)
+      const q = query(
+        collection(fireDB, "orders"),
+        orderBy("time"),
+        // limit(5)
+      );
+      const data = onSnapshot(q, (QuerySnapshot) => {
+        let ordersArray = [];
+        QuerySnapshot.forEach((doc) => {
+          ordersArray.push({ ...doc.data(), id: doc.id });
+        });
+        setorders(ordersArray)
+        setorderLen(ordersArray.length)
+        // console.log(orders)
+        setLoading(false);
       });
-      setorderLen(usersArray.length)
-      // console.log(orderLen)
-      setLoading(false);
+      return () => data;
     } catch (error) {
       console.log(error)
       setLoading(false)
     }
+  }
+  const orderhandle = (item) => {
+    // console.log(item)
+    setorder(item)
+
+    console.log(order.id)
+  }
+
+  const updateorder = async () => {
+    setLoading(true)
+    // console.log("clicked")
+    
+    try {
+      // setDoc is an asynchronous function provided by the Firestore library for updating a document with the specified data.
+      // doc is a function provided by the Firestore library that creates a reference to a specific document in the database.
+      // console.log(order.id)
+      // debugger;
+      await setDoc(doc(fireDB, "orders", order.id), order);
+      toast.success("order Updated successfully")
+      getOrderData();
+      setLoading(false)
+      window.location.href = '/dashboard'
+    } catch (error) {
+      setLoading(false)
+      console.log(error)
+    }
+    setorder("")
   }
 
   useEffect(() => {
@@ -225,11 +264,12 @@ function MyState(props) {
   }, []);
 
 
+  
   return (
     <myContext.Provider value={{
       mode, toggleMode, loading, setLoading,
-      product, setProducts, addProduct, edithandle, updateProduct, deleteProduct, products, user, searchkey, setSearchkey, filterType, setFilterType,
-      filterPrice, setFilterPrice, order, setorder,Addorder,orderLen
+      product, setProducts, addProduct, edithandle, updateProduct, deleteProduct,getProductData, products, user, searchkey, setSearchkey, filterType, setFilterType,
+      filterPrice, setFilterPrice, order, setorder,Addorder,orderLen,orders,orderhandle,updateorder,orderType, setorderType
     }}>
       {props.children}
     </myContext.Provider>

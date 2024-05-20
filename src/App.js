@@ -20,6 +20,7 @@ import AddProduct from './pages/admin/AddProduct';
 import UpdateProduct from './pages/admin/UpdateProduct';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import UpdateOrder from './pages/admin/UpdateOrder';
 function App() {
   return (
     <State>
@@ -35,6 +36,7 @@ function App() {
           <Route path="/productinfo/:id" element={<ProductInfo />} />
           <Route path="/addproduct" element={<ProtectedRoutesForAdmin><AddProduct/></ProtectedRoutesForAdmin>} />
           <Route path="/updateproduct" element={<ProtectedRoutesForAdmin><UpdateProduct/></ProtectedRoutesForAdmin>} />
+          <Route path="/updateorder" element={<ProtectedRoutesForAdmin><UpdateOrder/></ProtectedRoutesForAdmin>} />
           <Route path="/*" element={<Page />} />
         </Routes>
       </Router>
@@ -62,7 +64,7 @@ export const ProtectedRoutesForAdmin = ({children}) => {
   }
  
   
-  if (admin.user.email === 'noor@gmail.com') {
+  if (admin.user.email === 'noorsana24042002@gmail.com') {
     return children
   }
   else {

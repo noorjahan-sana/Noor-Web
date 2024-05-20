@@ -3,6 +3,7 @@ import myContext from '../context/myContext'
  // see filter and product card both to understand
 function Filter() {
     const context = useContext(myContext)
+    // console.log(context)
     const { mode, searchkey, setSearchkey, filterType, setFilterType,
         filterPrice, setFilterPrice, product } = context
         const uniqueCategories = [...new Set(product.map(item => item.category))];
